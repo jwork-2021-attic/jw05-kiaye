@@ -182,6 +182,7 @@ public class World implements Serializable{
                     tempx = temp2x;
                     tempy = temp2y;
                     }
+                    break;
                 }
             }
         } else if (tiles[x][y].isDiggable()) {
@@ -193,11 +194,8 @@ public class World implements Serializable{
         if (tiles[x][y].isGround()) {
             int tempx = x;
             int tempy = y;
-            Color color = AsciiPanel.white;
-            int i = 0;
             for (List<Creature> playerlist : paths){
                 if (playerlist.get(0) == player){
-                    color= playerlist.get(0).color();
                     for (Creature p : playerlist){
                         int temp2x = p.x();
                     int temp2y = p.y();
@@ -206,13 +204,11 @@ public class World implements Serializable{
                     tempx = temp2x;
                     tempy = temp2y;
                     }
-                }
-                else{
-                    i++;
+                    break;
                 }
             }
             CreatureFactory creatureFactory = new CreatureFactory(this);
-            creatureFactory.newbody(tempx, tempy, color, i);
+            creatureFactory.newbody(tempx, tempy, paths.get(0).size());
             // Creature newplayer = new Creature(this, (char)2, AsciiPanel.blue, 100, 20, 5, 9);
             // newplayer.setX(tempx);
             // newplayer.setY(tempy);

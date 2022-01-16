@@ -59,4 +59,38 @@ public class CreatureFactory implements Serializable{
         new FungusAI(fungus, this);
         return fungus;
     }
+
+    public Creature newbody(int x, int y, int n) {
+        n = (n+1) % 7;
+        Creature fungus;
+        switch (n){
+            case 1: 
+                fungus = new Creature(this.world, (char)2, AsciiPanel.red, 100, 20, 5, 0);
+                break;
+            case 2: 
+                fungus = new Creature(this.world, (char)2, AsciiPanel.yellow, 100, 20, 5, 0);
+                break; 
+            case 3: 
+                fungus = new Creature(this.world, (char)2, AsciiPanel.green, 100, 20, 5, 0);
+                break;
+            case 4: 
+                fungus = new Creature(this.world, (char)2, AsciiPanel.blue, 100, 20, 5, 0);
+                break;
+            case 5: 
+                fungus = new Creature(this.world, (char)2, AsciiPanel.magenta, 100, 20, 5, 0);
+                break;
+            case 6: 
+                fungus = new Creature(this.world, (char)2, AsciiPanel.cyan, 100, 20, 5, 0);
+                break;
+            case 7: 
+                fungus = new Creature(this.world, (char)2, AsciiPanel.white, 100, 20, 5, 0);
+                break;
+            default: 
+                fungus = new Creature(this.world, (char)2, AsciiPanel.white, 100, 20, 5, 0);
+                break;
+        }
+        world.addlocation(fungus, x, y, 0);
+        new FungusAI(fungus, this);
+        return fungus;
+    }
 }

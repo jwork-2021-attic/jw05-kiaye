@@ -53,7 +53,9 @@ public class ApplicationMain extends JFrame implements KeyListener {
     private Screen screen;
     private JButton newgame;
     private JButton oldgame;
+    private JButton multigame;
     private JPanel panel;
+    private int model = 0;
 
     private final static int PORT = 9093;
     private InetSocketAddress hostAddress = new InetSocketAddress("localhost", 9093);
@@ -85,8 +87,16 @@ public class ApplicationMain extends JFrame implements KeyListener {
                 oldstart();
             }
         });
+        multigame = new JButton("Multiplayer game!");
+        multigame.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                remove(panel);
+                multistart();
+            }
+        });
         panel.add(newgame);
         panel.add(oldgame);
+        panel.add(multigame);
         add(panel);
 
     }
@@ -102,17 +112,11 @@ public class ApplicationMain extends JFrame implements KeyListener {
         this.setFocusable(true);
         this.requestFocus();
         this.requestFocusInWindow();
-        //screen = new PlayScreen();
+        screen = new PlayScreen();
+        screen.addplayer(0);
         addKeyListener(this);
-        //repaint();
+        repaint();
        
-        try {
-            client = SocketChannel.open(hostAddress);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
         new Thread(new Freshmain(this)).start();
     }
 
@@ -150,6 +154,33 @@ public class ApplicationMain extends JFrame implements KeyListener {
         new Thread(new Freshmain(this)).start();
     }
 
+    public void multistart(){
+        model = 3;
+        File file = new File("log.txt");
+        if (file.exists()) {
+            file.delete();
+        }
+        terminal = new AsciiPanel(32, 32, AsciiFont.TALRYTH_15_15);
+        add(terminal);
+        pack();
+        this.setFocusable(true);
+        this.requestFocus();
+        this.requestFocusInWindow();
+        //screen = new PlayScreen();
+        addKeyListener(this);
+        //repaint();
+       
+        try {
+            client = SocketChannel.open(hostAddress);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        new Thread(new Freshmainclient(this)).start();
+
+    }
+
     Screen getscreen(){
         return screen;
     }
@@ -174,35 +205,41 @@ public class ApplicationMain extends JFrame implements KeyListener {
      * @param e
      */
     public void keyPressed(KeyEvent e) {
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();  
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
-            int dir = 0;
-            if(e.getKeyCode() == KeyEvent.VK_LEFT) {
-                dir = 1;
-            } 
-            else if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                dir = 2;
+        if (model == 3){
+            try {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();  
+                ObjectOutputStream oos = new ObjectOutputStream(bos);
+                int dir = 0;
+                if(e.getKeyCode() == KeyEvent.VK_LEFT) {
+                    dir = 1;
+                } 
+                else if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                    dir = 2;
+                }
+                else if(e.getKeyCode() == KeyEvent.VK_UP) {
+                    dir = 3;
+                }
+                else if(e.getKeyCode() == KeyEvent.VK_DOWN) {
+                    dir = 4;
+                }
+                if(dir == 0) return;
+                oos.writeObject(dir);
+                byte[] bytes = bos.toByteArray(); 
+                ByteBuffer buffer = ByteBuffer.allocate(1024);
+                buffer.put(bytes);
+                buffer.flip();
+                client.write(buffer);
+                buffer.clear();
+                bos.close();
+                oos.close();
+            } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
             }
-            else if(e.getKeyCode() == KeyEvent.VK_UP) {
-                dir = 3;
-            }
-            else if(e.getKeyCode() == KeyEvent.VK_DOWN) {
-                dir = 4;
-            }
-            if(dir == 0) return;
-            oos.writeObject(dir);
-            byte[] bytes = bos.toByteArray(); 
-            ByteBuffer buffer = ByteBuffer.allocate(1024);
-            buffer.put(bytes);
-            buffer.flip();
-            client.write(buffer);
-            buffer.clear();
-            bos.close();
-            oos.close();
-        } catch (IOException e1) {
-        // TODO Auto-generated catch block
-        e1.printStackTrace();
+        }
+        else{
+            screen = screen.respondToUserInput(e);
+            repaint();
         }
     }
 

@@ -63,8 +63,10 @@ public class PlayScreen implements Screen, Serializable {
         this.world = world;
         this.messages = new ArrayList<String>();
         this.oldMessages = new ArrayList<String>();
-        // player = world.getPaths().get(0);
-        // player.move(player.getmx(), player.getmy());
+        Creature player = world.getPaths().get(0).get(0);
+        players = new ArrayList<>();
+        players.add(player);
+        player.move(player.getmx(), player.getmy());
     }
     // private void createCreatures(CreatureFactory creatureFactory) {
     //     this.player = creatureFactory.newPlayer(this.messages);
@@ -104,6 +106,23 @@ public class PlayScreen implements Screen, Serializable {
         messages.clear();
     }
 
+    private void save() throws IOException {
+        File file = new File("log.txt");
+        if (file.exists()) {
+            file.delete();
+        }
+        FileOutputStream fileOutputStream = new FileOutputStream("log.txt", true);
+        ObjectOutputStream objectOutputStream;
+        if(file.exists()) {
+            objectOutputStream = new ObjectOutputStream(fileOutputStream);
+        }
+        else {
+            objectOutputStream = new ObjectOutputStream(fileOutputStream);
+        }
+        objectOutputStream.writeObject(this.world);
+        objectOutputStream.flush();
+        objectOutputStream.close();
+    }
 
     @Override
     public void displayOutput(AsciiPanel terminal) {
@@ -112,40 +131,42 @@ public class PlayScreen implements Screen, Serializable {
         // Player
         //terminal.write(player.glyph(), player.x() - getScrollX(), player.y() - getScrollY(), player.color());
         // Stats
-        //String stats = String.format("Score:%3d!\n Press 's' to save!", player.getscore());
-        //terminal.write(stats, 1, 31);
+        String stats = String.format("Score:%3d!\n Press 's' to save!", players.get(0).getscore());
+        terminal.write(stats, 1, 31);
         // Messages
         displayMessages(terminal, this.messages);
     }
 
     @Override
-    public Screen respondToUserInput(int dir, int index) {
+    public Screen respondToUserInput(KeyEvent key) {
         int res = 0;
-        switch (dir) {
-            case 1:
+        switch (key.getKeyCode()) {
+            case KeyEvent.VK_LEFT:
                 //res = player.moveBy(-1, 0);
-                players.get(index).setmx(-1);
-                players.get(index).setmy(0);
+                players.get(0).setmx(-1);
+                players.get(0).setmy(0);
                 break;
-            case 2:
+            case KeyEvent.VK_RIGHT:
                 //res = player.moveBy(1, 0);
-                players.get(index).setmx(1);
-                players.get(index).setmy(0);
+                players.get(0).setmx(1);
+                players.get(0).setmy(0);
                 break;
-            case 3:
+            case KeyEvent.VK_UP:
                 //res = player.moveBy(0, -1);
-                players.get(index).setmx(0);
-                players.get(index).setmy(-1);
+                players.get(0).setmx(0);
+                players.get(0).setmy(-1);
                 break;
-            case 4:
+            case KeyEvent.VK_DOWN:
                 //res = player.moveBy(0, 1);
-                players.get(index).setmx(0);
-                players.get(index).setmy(1);
+                players.get(0).setmx(0);
+                players.get(0).setmy(1);
                 break;
-            default:
-                players.get(index).setmx(0);
-                players.get(index).setmy(0);
-                break;
+            case KeyEvent.VK_S:
+                try {
+                    save();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
         }
         //new Thread(new creaturethread()).start();
         // if (players.get(index).getstate() == -1) return new LoseScreen();
@@ -157,6 +178,15 @@ public class PlayScreen implements Screen, Serializable {
 
     @Override
     public void addplayer(int index){
+        CreatureFactory creatureFactory = new CreatureFactory(this.world);
+        Creature player = new Creature(this.world, (char)2, AsciiPanel.red, 100, 20, 5, 9);
+        world.addAtEmptyLocation(player);
+        List<Creature> listplayer = new ArrayList<>();
+        listplayer.add(player);
+        players.add(player);
+        world.addpath(listplayer);
+        new PlayerAI(player, messages);
+        creatureFactory.newFungus();
 
     }
     public int getScrollX() {

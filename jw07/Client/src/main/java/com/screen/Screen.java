@@ -28,7 +28,7 @@ public interface Screen {
 
     public void displayOutput(AsciiPanel terminal);
 
-    public Screen respondToUserInput(int dir, int index);
+    public Screen respondToUserInput(KeyEvent key);
 
     public void addplayer(int index);
 }

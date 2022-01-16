@@ -1,3 +1,4 @@
+com\ApplicationMain$3.class
 com\world\PlayerAI.class
 com\world\FungusAI.class
 com\ApplicationMain.class
@@ -14,6 +15,7 @@ com\asciiPanel\TileTransformer.class
 com\world\Line.class
 com\world\Creature.class
 com\ApplicationMain$1.class
+com\Freshmainclient.class
 com\asciiPanel\AsciiCharacterData.class
 com\world\World.class
 com\asciiPanel\AsciiFont.class
